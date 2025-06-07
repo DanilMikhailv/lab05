@@ -23,6 +23,8 @@ class MockTransaction : public Transaction {
 };
 
 using ::testing::AtLeast;
+using ::testing::Return;
+using ::testing::_; // Import necessary header for ON_CALL
 
 TEST(Account, Mock) {
   MockAccount ac1(1, 1000);
@@ -34,19 +36,25 @@ TEST(Account, Mock) {
   ac1.ChangeBalance(1);
   EXPECT_CALL(ac1, Unlock()).Times(AtLeast(1));
   ac1.Unlock();
-  
+
 }
 
 TEST(Transaction, Mock) {
-  Account ac1(1, 10000);
-  Account ac2(2, 10000);
-  MockTransaction t1;
-  EXPECT_CALL(t1, SaveToDataBase(ac1, ac2, 1999)).Times(AtLeast(1));
-  t1.Make(ac1, ac2, 1999);
-  
-  
-}
+    MockAccount fromAccount(1, 1000);
+    MockAccount toAccount(2, 500);
+    MockTransaction transaction;
 
+    // Set expectations for Account methods called by Transaction::Make
+    EXPECT_CALL(fromAccount, Lock()).Times(1);
+    EXPECT_CALL(toAccount, Lock()).Times(1);
+    EXPECT_CALL(fromAccount, ChangeBalance(-200)).Times(1);
+    EXPECT_CALL(toAccount, ChangeBalance(200)).Times(1);
+    EXPECT_CALL(fromAccount, Unlock()).Times(1);
+    EXPECT_CALL(toAccount, Unlock()).Times(1);
+
+    // Execute the transaction
+    transaction.Make(fromAccount, toAccount, 200);
+}
 TEST(Account, Methods) {
   Account ac1(1, 1000);
   EXPECT_EQ(1000, ac1.GetBalance());

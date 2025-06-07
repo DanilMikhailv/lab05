@@ -21,6 +21,8 @@ make
 
 **Тесты**
 
+[ОТЧЕТ ПО ТЕСТАМ](https://coveralls.io/github/DanilMikhailv/lab05)
+
 ```
 cd build
 ctest
